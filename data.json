@@ -1,11 +1,13 @@
 {
     "title": "Coût total du projet Apollo 18",
-    "description": "On lance Apollo 18, projet lunaire. Combien ça va coûter 30 jours après le lancement de la fusée? Si la fusée explose, on appliquera une interpolation basique.",
+    "description": "On lance Apollo 18, projet lunaire. Combien ça va coûter 30 jours après le lancement de la fusée? Si la fusée explose, on appliquera une interpolation basique.\nLe gagnant se fait inviter au resto par tous les autres participants.",
     "currency": "€",
+    "launchDate": null,
     "bets": [
         { "name": "Pierre-Georges",  "amount": 3250 },
         { "name": "Benjamin",     "amount": 850 },
         { "name": "Benoit", "amount": 5000 },
-        { "name": "Julien", "amount": 3000 }
+        { "name": "Julien", "amount": 3000 },
+        { "name": "Antoine", "amount": 4950 }
     ]
 }
