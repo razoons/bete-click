@@ -9,6 +9,7 @@
         { "name": "Benoit", "amount": 5000 },
         { "name": "Julien", "amount": 3000 },
         { "name": "Antoine", "amount": 4950 },
-        { "name": "Alex", "amount": 1750}
+        { "name": "Alex", "amount": 1750},
+        { "name": "JM", "amount": 100000}
     ]
 }
