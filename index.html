@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paris — Estimation</title>
+    <title>Bête Click — Ze game</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -409,6 +409,167 @@
             50%       { opacity: 0.4; }
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-7px); }
+        }
+
+        /* ── Mission Status ── */
+        .mission-section {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.15s;
+        }
+
+        .mission-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            padding: 1.75rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* shared top-line accent */
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+        }
+
+        /* ·· Waiting ·· */
+        .mission-card.waiting { border-color: var(--border); }
+        .mission-card.waiting::before {
+            background: linear-gradient(90deg, transparent, var(--text-muted), transparent);
+            opacity: 0.35;
+        }
+
+        .mission-waiting-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 0.75rem;
+            animation: float 3s ease-in-out infinite;
+            filter: grayscale(0.3);
+        }
+
+        .mission-waiting-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ·· Active countdown ·· */
+        .mission-card.active { border-color: rgba(0, 212, 255, 0.25); }
+        .mission-card.active::before {
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.55;
+        }
+
+        .mission-dates {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .mission-date-item { display: flex; flex-direction: column; gap: 0.2rem; }
+
+        .mission-date-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.62rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .mission-date-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .mission-date-value.accent { color: var(--accent); }
+
+        .countdown {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cd-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.8rem 1.3rem;
+            min-width: 74px;
+        }
+
+        .cd-num {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--accent);
+            text-shadow: 0 0 24px rgba(0, 212, 255, 0.45);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
+
+        .cd-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.58rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        .cd-sep {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            opacity: 0.3;
+            margin-bottom: 1.4rem;
+        }
+
+        /* ·· Landed ·· */
+        .mission-card.landed { border-color: rgba(16, 185, 129, 0.3); }
+        .mission-card.landed::before {
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            opacity: 0.55;
+        }
+
+        .mission-landed-icon { font-size: 2.2rem; display: block; margin-bottom: 0.75rem; }
+
+        .mission-landed-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #10b981;
+        }
+
+        .mission-landed-date {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 600px) {
             .container { padding: 2.5rem 1.25rem 4rem; }
@@ -427,6 +588,8 @@
 </div>
 
 <script>
+    let countdownInterval = null;
+
     const COLORS = [
         { hex: '#00d4ff', rgb: '0, 212, 255' },
         { hex: '#a855f7', rgb: '168, 85, 247' },
@@ -466,8 +629,94 @@
         });
     }
 
+    function fmtDate(date) {
+        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function buildMissionHTML(launchDate) {
+        if (!launchDate || launchDate===null) {
+            return `
+                <section class="mission-section">
+                    <div class="section-label">Statut mission</div>
+                    <div class="mission-card waiting">
+                        <span class="mission-waiting-icon">🚀</span>
+                        <div class="mission-waiting-text">Fusée en attente de lancement</div>
+                    </div>
+                </section>`;
+        }
+
+        const launch     = new Date(launchDate);
+        const alunissage = new Date(launch.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        if (Date.now() >= alunissage.getTime()) {
+            return `
+                <section class="mission-section">
+                    <div class="section-label">Statut mission</div>
+                    <div class="mission-card landed">
+                        <span class="mission-landed-icon">🌕</span>
+                        <div class="mission-landed-text">Alunissage effectué</div>
+                        <div class="mission-landed-date">Le ${fmtDate(alunissage)}</div>
+                    </div>
+                </section>`;
+        }
+
+        return `
+            <section class="mission-section">
+                <div class="section-label">Statut mission</div>
+                <div class="mission-card active">
+                    <div class="mission-dates">
+                        <div class="mission-date-item">
+                            <span class="mission-date-label">Lancement</span>
+                            <span class="mission-date-value">${fmtDate(launch)}</span>
+                        </div>
+                        <div class="mission-date-item">
+                            <span class="mission-date-label">Alunissage (J+30)</span>
+                            <span class="mission-date-value accent">${fmtDate(alunissage)}</span>
+                        </div>
+                    </div>
+                    <div class="countdown" id="countdown"></div>
+                </div>
+            </section>`;
+    }
+
+    function startCountdown(launchDate) {
+        if (!launchDate) return;
+        const alunissage = new Date(launchDate).getTime() + 30 * 24 * 60 * 60 * 1000;
+
+        const pad = n => String(n).padStart(2, '0');
+
+        function tick() {
+            const el = document.getElementById('countdown');
+            if (!el) { clearInterval(countdownInterval); return; }
+
+            const diff = alunissage - Date.now();
+            if (diff <= 0) {
+                el.innerHTML = '<div class="mission-landed-text" style="color:var(--accent)">Alunissage !</div>';
+                clearInterval(countdownInterval);
+                return;
+            }
+
+            const days  = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const mins  = Math.floor((diff % 3600000)  / 60000);
+            const secs  = Math.floor((diff % 60000)    / 1000);
+
+            el.innerHTML = `
+                <div class="cd-block"><span class="cd-num">${pad(days)}</span><span class="cd-label">Jours</span></div>
+                <div class="cd-sep">:</div>
+                <div class="cd-block"><span class="cd-num">${pad(hours)}</span><span class="cd-label">Heures</span></div>
+                <div class="cd-sep">:</div>
+                <div class="cd-block"><span class="cd-num">${pad(mins)}</span><span class="cd-label">Minutes</span></div>
+                <div class="cd-sep">:</div>
+                <div class="cd-block"><span class="cd-num">${pad(secs)}</span><span class="cd-label">Secondes</span></div>`;
+        }
+
+        tick();
+        countdownInterval = setInterval(tick, 1000);
+    }
+
     function render(data) {
-        const { title, description, currency = '€', bets } = data;
+        const { title, description, currency = '€', bets, launchDate } = data;
 
         if (!bets || bets.length === 0) {
             document.getElementById('app').innerHTML =
@@ -559,6 +808,8 @@
                 <p class="description">${esc(description)}</p>
             </header>
 
+            ${buildMissionHTML(launchDate || null)}
+
             <section class="range-section">
                 <div class="section-label">Distribution des plages</div>
                 <div class="range-bar">${segmentsHTML}</div>
@@ -573,6 +824,8 @@
             <footer class="footer">
                 Les plages sont calculées à partir des mi-points entre estimations adjacentes
             </footer>`;
+
+        startCountdown(launchDate || null);
     }
 
     fetch(JSON_URL + '?t=' + Date.now())
