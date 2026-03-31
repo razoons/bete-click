@@ -4,7 +4,7 @@
     "currency": "€",
     "launchDate": null,
     "bets": [
-        { "name": "Pierre-Georges",  "amount": 3250 },
+        { "name": "Pierre-Georges",  "amount": 1225 },
         { "name": "Benjamin",     "amount": 850 },
         { "name": "Benoit", "amount": 5000 },
         { "name": "Julien", "amount": 3000 },
