@@ -1,0 +1,10 @@
+{
+    "title": "Coût total du projet",
+    "description": "Chacun a misé sur le coût total de développement et de mise en production de la nouvelle plateforme. Qui sera le plus proche du prix réel ?",
+    "currency": "€",
+    "bets": [
+        { "name": "Albert",  "amount": 100 },
+        { "name": "Béa",     "amount": 150 },
+        { "name": "Charlie", "amount": 152 }
+    ]
+}

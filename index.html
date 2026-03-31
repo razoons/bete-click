@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paris — Estimation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #07090f;
+            --surface: #0d1220;
+            --surface-2: #111828;
+            --border: #1c2e4a;
+            --text: #dde6f0;
+            --text-muted: #4e6180;
+            --accent: #00d4ff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Dot grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, #1c2e4a 1px, transparent 1px);
+            background-size: 36px 36px;
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top glow */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(0, 180, 255, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 4rem 2rem 5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Header ── */
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            background: rgba(0, 212, 255, 0.04);
+            padding: 0.35rem 1.1rem;
+            border-radius: 100px;
+            margin-bottom: 1.75rem;
+        }
+
+        .header-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.1;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #ffffff 20%, #7ecfff 60%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .description {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── Section labels ── */
+        .section-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Range bar ── */
+        .range-section {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.25s;
+        }
+
+        .range-bar {
+            display: flex;
+            height: 52px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .range-segment {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: filter 0.2s, transform 0.2s;
+            cursor: default;
+            min-width: 0;
+        }
+
+        .range-segment:hover {
+            filter: brightness(1.35);
+            z-index: 1;
+        }
+
+        .range-segment:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .range-segment-inner {
+            padding: 0 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            overflow: hidden;
+        }
+
+        .range-segment-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+        }
+
+        .range-segment-range {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.45);
+            white-space: nowrap;
+        }
+
+        .range-axis {
+            display: flex;
+            margin-top: 0.5rem;
+        }
+
+        .range-axis-cell {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-align: right;
+            padding-right: 0.4rem;
+            padding-top: 0.3rem;
+            border-right: 1px solid var(--border);
+            position: relative;
+        }
+
+        .range-axis-cell:last-child {
+            flex: 1;
+            border-right: none;
+            text-align: right;
+        }
+
+        /* ── Cards grid ── */
+        .cards-section {
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.45s;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem 1.75rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+            opacity: 0;
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(var(--card-rgb), 0.4);
+        }
+
+        /* Top accent line */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--card-color);
+            box-shadow: 0 0 16px 0 var(--card-color);
+        }
+
+        /* Subtle radial glow */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 50% -10%, rgba(var(--card-rgb), 0.06) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .card-rank {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--card-color);
+            opacity: 0.65;
+            margin-bottom: 0.6rem;
+        }
+
+        .card-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1.25rem;
+            line-height: 1;
+        }
+
+        .card-amount-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+        }
+
+        .card-amount {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--card-color);
+            text-shadow: 0 0 40px rgba(var(--card-rgb), 0.45);
+            margin-bottom: 1.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .card-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 1.25rem;
+        }
+
+        .card-range-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-range {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-range-arrow {
+            color: var(--card-color);
+            opacity: 0.6;
+            font-size: 1rem;
+        }
+
+        .card-range-inf {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.4rem;
+            color: var(--card-color);
+            opacity: 0.7;
+        }
+
+        /* Mini bar */
+        .card-mini-bar {
+            height: 3px;
+            background: var(--surface-2);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-mini-bar-fill {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            border-radius: 3px;
+            background: var(--card-color);
+            box-shadow: 0 0 8px rgba(var(--card-rgb), 0.7);
+        }
+
+        /* ── Loading / error ── */
+        .status {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.1em;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .container { padding: 2.5rem 1.25rem 4rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="app">
+        <div class="status">
+            <span class="status-icon">◌</span>
+            Chargement des données…
+        </div>
+    </div>
+</div>
+
+<script>
+    const COLORS = [
+        { hex: '#00d4ff', rgb: '0, 212, 255' },
+        { hex: '#a855f7', rgb: '168, 85, 247' },
+        { hex: '#f59e0b', rgb: '245, 158, 11' },
+        { hex: '#10b981', rgb: '16, 185, 129' },
+        { hex: '#f43f5e', rgb: '244, 63, 94' },
+        { hex: '#06b6d4', rgb: '6, 182, 212' },
+        { hex: '#818cf8', rgb: '129, 140, 248' },
+        { hex: '#34d399', rgb: '52, 211, 153' },
+    ];
+
+    const JSON_URL = './data.json';
+
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function fmt(n, currency) {
+        if (!isFinite(n)) return '∞';
+        return n.toLocaleString('fr-FR') + '\u202f' + (currency || '€');
+    }
+
+    function computeRanges(bets) {
+        const sorted = [...bets].sort((a, b) => a.amount - b.amount);
+        return sorted.map((bet, i) => {
+            const rangeMin = i === 0
+                ? 0
+                : Math.round((sorted[i - 1].amount + bet.amount) / 2);
+            const rangeMax = i === sorted.length - 1
+                ? Infinity
+                : Math.round((bet.amount + sorted[i + 1].amount) / 2);
+            return { ...bet, rangeMin, rangeMax, color: COLORS[i % COLORS.length] };
+        });
+    }
+
+    function render(data) {
+        const { title, description, currency = '€', bets } = data;
+
+        if (!bets || bets.length === 0) {
+            document.getElementById('app').innerHTML =
+                '<div class="status"><span class="status-icon">◻</span>Aucun pari à afficher.</div>';
+            return;
+        }
+
+        const participants = computeRanges(bets);
+        const lastBet = participants[participants.length - 1].amount;
+        const secondLast = participants.length > 1
+            ? participants[participants.length - 2].rangeMax
+            : 0;
+        const visualMax = lastBet + (lastBet - secondLast) * 1.6;
+
+        // ── Range bar ──────────────────────────────────────────────
+        const segmentsHTML = participants.map((p, i) => {
+            const segStart = p.rangeMin;
+            const segEnd   = isFinite(p.rangeMax) ? p.rangeMax : visualMax;
+            const widthPct = ((segEnd - segStart) / visualMax * 100).toFixed(2);
+            const isLast   = i === participants.length - 1;
+
+            const bg = isLast
+                ? `linear-gradient(90deg, ${p.color.hex}55 0%, ${p.color.hex}18 100%)`
+                : `${p.color.hex}33`;
+
+            const rangeText = isFinite(p.rangeMax)
+                ? `${fmt(p.rangeMin, currency)} — ${fmt(p.rangeMax, currency)}`
+                : `${fmt(p.rangeMin, currency)} — ∞`;
+
+            return `
+                <div class="range-segment" style="width:${widthPct}%;background:${bg}" title="${esc(p.name)}: ${rangeText}">
+                    <div class="range-segment-inner">
+                        <span class="range-segment-name">${esc(p.name)}${isLast ? ' →∞' : ''}</span>
+                        <span class="range-segment-range">${fmt(p.amount, currency)}</span>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // Axis labels below the bar (one per segment width)
+        const axisHTML = participants.map((p, i) => {
+            const segStart = p.rangeMin;
+            const segEnd   = isFinite(p.rangeMax) ? p.rangeMax : visualMax;
+            const widthPct = ((segEnd - segStart) / visualMax * 100).toFixed(2);
+            const isLast   = i === participants.length - 1;
+            const label    = isLast ? '∞' : fmt(p.rangeMax, currency);
+            return `<div class="range-axis-cell" style="width:${widthPct}%">${label}</div>`;
+        }).join('');
+
+        // ── Cards ──────────────────────────────────────────────────
+        const cardsHTML = participants.map((p, i) => {
+            const rangeMin = fmt(p.rangeMin, currency);
+            const rangeMax = isFinite(p.rangeMax) ? fmt(p.rangeMax, currency) : null;
+
+            const barStart = (p.rangeMin / visualMax * 100).toFixed(1);
+            const barEnd   = isFinite(p.rangeMax) ? p.rangeMax : visualMax;
+            const barWidth = ((barEnd - p.rangeMin) / visualMax * 100).toFixed(1);
+
+            const delay = 0.55 + i * 0.1;
+
+            const rankLabel = ['1er', '2e', '3e', '4e', '5e', '6e', '7e', '8e'][i] || `${i + 1}e`;
+
+            return `
+                <div class="card" style="--card-color:${p.color.hex};--card-rgb:${p.color.rgb};animation-delay:${delay}s">
+                    <div class="card-rank">Participant · ${rankLabel}</div>
+                    <div class="card-name">${esc(p.name)}</div>
+                    <div class="card-amount-label">Estimation</div>
+                    <div class="card-amount">${fmt(p.amount, currency)}</div>
+                    <div class="card-divider"></div>
+                    <div class="card-range-label">Plage couverte</div>
+                    <div class="card-range">
+                        <span>${rangeMin}</span>
+                        <span class="card-range-arrow">→</span>
+                        ${rangeMax
+                            ? `<span>${rangeMax}</span>`
+                            : `<span class="card-range-inf">∞</span>`}
+                    </div>
+                    <div class="card-mini-bar">
+                        <div class="card-mini-bar-fill" style="left:${barStart}%;width:${barWidth}%"></div>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // ── Assemble ───────────────────────────────────────────────
+        document.title = title + ' — Paris';
+        document.getElementById('app').innerHTML = `
+            <header class="header">
+                <div class="header-badge">Paris · Estimation du coût</div>
+                <h1 class="title">${esc(title)}</h1>
+                <p class="description">${esc(description)}</p>
+            </header>
+
+            <section class="range-section">
+                <div class="section-label">Distribution des plages</div>
+                <div class="range-bar">${segmentsHTML}</div>
+                <div class="range-axis">${axisHTML}</div>
+            </section>
+
+            <section class="cards-section">
+                <div class="section-label">Estimations</div>
+                <div class="cards-grid">${cardsHTML}</div>
+            </section>
+
+            <footer class="footer">
+                Les plages sont calculées à partir des mi-points entre estimations adjacentes
+            </footer>`;
+    }
+
+    fetch(JSON_URL + '?t=' + Date.now())
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(render)
+        .catch(err => {
+            document.getElementById('app').innerHTML = `
+                <div class="status">
+                    <span class="status-icon">⚠</span>
+                    Impossible de charger <code>data.json</code><br>
+                    <small style="opacity:.6">${esc(err.message)}</small>
+                </div>`;
+        });
+</script>
+</body>
+</html>
